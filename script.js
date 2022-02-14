@@ -15,6 +15,12 @@ console.log(Platformimage);
 
 const platformSmallImage = createImage('./images/platformSmallTall.png');
 
+const jumpAudio = new Audio('./audio/jump.mp3');
+jumpAudio.volume = 0.05;
+
+const lostAudio = new Audio('./audio/lost.wav');
+lostAudio.volume = 0.5;
+
 
 function createImage(imageSRC){
     const image = new Image();
@@ -177,6 +183,7 @@ function animate(){
 
     //LOSE CONDITION
     if(player.position.y > canvas.height) {
+        lostAudio.play();
         init();
     }
 
@@ -188,6 +195,7 @@ addEventListener('keydown', ({keyCode}) => {
 
     switch(keyCode){
         case 87:
+            jumpAudio.play();
             player.velocity.y -= 15;
             break;
         case 65:
