@@ -13,6 +13,8 @@ const Platformimage = new Image();
 Platformimage.src = platformSRC;
 console.log(Platformimage);
 
+const platformSmallImage = createImage('./images/platformSmallTall.png');
+
 
 function createImage(imageSRC){
     const image = new Image();
@@ -32,6 +34,7 @@ class Player{
         };
         this.width = 30;
         this.height = 30;
+        this.speed = 5;
     }
     draw(){
         c.fillStyle = 'red';
@@ -44,8 +47,6 @@ class Player{
 
         if(this.position.y + this.velocity.y + this.height <= canvas.height)
             this.velocity.y += gravity
-        else
-            this.velocity.y = 0;
     }
 }
 
@@ -83,11 +84,11 @@ class GenericObject{
     }
 }
 
+let player = new Player();
 
-const player = new Player();
-const platforms = [new Platform({x: -1, y: 470, image: Platformimage}), new Platform({x: Platformimage.width - 3, y: 470, image: Platformimage})];
+let platforms = [];
 
-const GenericObjects = [new GenericObject({x: -1, y: -1, image: createImage('./images/background.png')}), new GenericObject({x:0, y:0, image: createImage('./images/hills.png')})];
+let GenericObjects = [new GenericObject({x: -1, y: -1, image: createImage('./images/background.png')}), new GenericObject({x:0, y:0, image: createImage('./images/hills.png')})];
 
 const keys = {
     right: {
@@ -96,9 +97,28 @@ const keys = {
     left: {
         pressed: false
     }
-};
-
+};    
+    
 let scrollOffset = 0;
+
+function init(){
+    player = new Player();
+    platforms = [
+        new Platform({x: Platformimage.width*5 + 300 - 2 - platformSmallImage.width, y: 270, image: platformSmallImage}),
+        new Platform({x: -1, y: 470, image: Platformimage}), 
+        new Platform({x: Platformimage.width - 3, y: 470, image: Platformimage}), 
+        new Platform({x: Platformimage.width*2 + 100, y: 470, image: Platformimage}),
+        new Platform({x: Platformimage.width*3 + 300, y: 470, image: Platformimage}),
+        new Platform({x: Platformimage.width*4 + 300 - 2, y: 470, image: Platformimage}),
+        new Platform({x: Platformimage.width*5 + 650 - 2, y: 470, image: Platformimage}),
+    ];
+
+    GenericObjects = [new GenericObject({x: -1, y: -1, image: createImage('./images/background.png')}), new GenericObject({x:0, y:0, image: createImage('./images/hills.png')})];
+
+    scrollOffset = 0;
+}
+
+init();
 
 animate();
 
@@ -116,28 +136,28 @@ function animate(){
     });
     player.update();
     if(keys.right.pressed && player.position.x < 400){
-        player.velocity.x = 5;
+        player.velocity.x = player.speed;
     }
-    else if(keys.left.pressed && player.position.x >= 100){
-        player.velocity.x = -5;
+    else if((keys.left.pressed && player.position.x >= 100) || (keys.left.pressed && scrollOffset == 0 && player.position.x > 0)){
+        player.velocity.x = -player.speed;
     }
     else{
         player.velocity.x = 0;
         if(keys.right.pressed){
-            scrollOffset += 5;
+            scrollOffset += player.speed;
             platforms.forEach(platform => {
-                platform.position.x -= 5;
+                platform.position.x -= player.speed;
             });
             GenericObjects.forEach(genericObject => {
-                genericObject.position.x -= 3;
+                genericObject.position.x -= player.speed*0.66;
             });
-        } else if(keys.left.pressed){
-            scrollOffset -= 5;
+        } else if(keys.left.pressed && scrollOffset > 0){
+            scrollOffset -= player.speed;
             platforms.forEach(platform => {
-                platform.position.x += 5;
+                platform.position.x += player.speed;
             });
             GenericObjects.forEach(genericObject => {
-                genericObject.position.x += 3;
+                genericObject.position.x += player.speed*0.66;
             });
         }
     }
@@ -150,8 +170,14 @@ function animate(){
         }
     });
 
-    if(scrollOffset >= 2000){
+    //WIN CONDITION
+    if(scrollOffset >= Platformimage.width*5 + 250 - 2){
         console.log("YOU WIN");
+    }
+
+    //LOSE CONDITION
+    if(player.position.y > canvas.height) {
+        init();
     }
 
     requestAnimationFrame(animate);
@@ -162,7 +188,7 @@ addEventListener('keydown', ({keyCode}) => {
 
     switch(keyCode){
         case 87:
-            player.velocity.y -= 20;
+            player.velocity.y -= 15;
             break;
         case 65:
             keys.left.pressed = true;
