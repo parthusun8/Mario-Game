@@ -122,15 +122,13 @@ function init(){
         new Platform({x: Platformimage.width*3 + 300, y: 470, image: Platformimage}),
         new Platform({x: Platformimage.width*4 + 300 - 2, y: 470, image: Platformimage}),
         new Platform({x: Platformimage.width*5 + 650 - 2, y: 470, image: Platformimage}),
+        new Platform({x: Platformimage.width*6 + 650 - 3, y: 470, image: Platformimage}),
     ];
 
     GenericObjects = [new GenericObject({x: -1, y: -1, image: createImage('./images/background.png')}), new GenericObject({x:0, y:0, image: createImage('./images/hills.png')})];
 
     scrollOffset = 0;
     score.innerText = scrollOffset;
-}
-function timeInit(){
-    setTimeout(init(), 2000);
 }
 
 init();
@@ -191,12 +189,12 @@ function animate(){
         init();
     }
 
-    if(scrollOffset < Platformimage.width*5 + 250 - 2)
+    if(scrollOffset < Platformimage.width*6 + 650 - 3)
         score.innerText = `Points : ${Math.floor(scrollOffset/100)}`;
     //WIN CONDITION
     else{
         winAudio.play();
-        score.style.margin = '1rem 1rem 1rem 1rem';
+        // score.style.margin = '1rem 1rem 1rem 1rem';
         score.style.position = 'relative';
         score.innerText = "YOU WIN!";
     }
